@@ -1,0 +1,6 @@
+[centos-openshift-origin]
+name=CentOS OpenShift Origin
+baseurl=https://cbs.centos.org/repos/paas7-openshift-origin311-testing/x86_64/os/
+enabled=1
+gpgcheck=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-PaaS

@@ -1,0 +1,15 @@
+---
+- hosts: all
+  
+  roles: 
+    - role: docker-common
+      become: True
+    
+    - role: docker-ldap
+      become: True
+
+    - role: okd-prep
+      become: False
+      
+  
+

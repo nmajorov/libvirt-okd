@@ -1,0 +1,19 @@
+<network connections='1' ipv6='yes'>
+  <name>okd</name>
+  <uuid>29148153-cc86-4b56-b656-c05f1a3e6052</uuid>
+  <forward mode='nat'>
+    <nat>
+      <port start='1024' end='65535'/>
+    </nat>
+  </forward>
+  <bridge name='virbr2' stp='on' delay='0'/>
+  <mac address='52:54:00:f5:2a:de'/>
+  
+  <domain name="niko.io" localOnly="no"/>
+  <ip address='192.168.121.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='192.168.121.1' end='192.168.121.254'/>
+    </dhcp>
+  </ip>
+</network>
+

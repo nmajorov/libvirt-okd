@@ -1,0 +1,84 @@
+- name: "install needed rpm(s)"
+  become: True
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ default_r_openshift_node_image_prep_packages }}"
+  register: result
+  until: result is succeeded
+  tags:
+    - common
+    - okd
+
+- name: Add repository
+  become: True
+  yum_repository:
+    name: epel
+    description: EPEL YUM repo
+    baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+    enabled: no
+    gpgcheck: no
+  tags:
+    - common
+    - okd
+
+
+- name: "copy origin repo definition"
+  become: True
+  copy:
+    src: "files/centos-openshift-origin.repo"
+    dest: "/etc/yum.repos.d/CentOS-OpenShift-Origin.repo"
+  when: (ansible_facts['hostname'] == "bastion")
+  tags:
+    - common
+    - okd
+
+- name: "install ansible from epel repo"
+  become: True
+  yum: 
+    name: 
+      - ansible 
+      - pyOpenSSL
+    enablerepo: epel
+  when: (ansible_facts['hostname'] == "bastion")
+  tags:
+    - common
+    - okd
+
+- name: "check out git repo"
+  git:
+    repo: 'https://github.com/openshift/openshift-ansible'
+    dest: /home/{{ose_user}}/openshift-ansible
+    version: "release-{{ ose_version }}"
+  when: (ansible_facts['hostname'] == "bastion")
+  tags:
+    - common
+    - okd
+    
+- name: "copy inventory file for bastion"
+  template:
+    src: okd-inventory.j2
+    dest: /home/{{ose_user}}/okd-inventory
+  when: (ansible_facts['hostname'] == "bastion")
+  tags:
+    - common
+    - okd
+
+- name: "copy ansible config file for bastion"
+  copy:
+    src: files/ansible.cfg
+    dest: /home/{{ose_user}}/ansible.cfg
+  when: (ansible_facts['hostname'] == "bastion")
+  tags:
+    - common
+    - okd
+
+- name: Install SSH private key
+  copy:
+      src: "{{ admin_privkey }}"
+      dest: "{{ dest_key }}"
+      mode: 0600
+      owner: "{{ ose_user }}"
+  tags:
+    - common
+    - okd

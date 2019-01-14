@@ -1,0 +1,32 @@
+ose_user: "vagrant"
+ose_version: "3.11"
+default_r_openshift_node_image_prep_packages:
+  - git
+  - wget
+  - bash-completion
+  - docker
+  - dnsmasq
+  - logrotate
+  - httpd-tools
+  - bind-utils
+  - firewalld
+  - libselinux-python
+  - conntrack-tools
+  - iproute
+  - python-dbus
+  - PyYAML
+  - yum-utils
+  - glusterfs-fuse
+  - device-mapper-multipath
+  - nfs-utils
+  - iscsi-initiator-utils
+  - ceph-common
+  - sos
+  - kexec-tools
+  - psacct
+  - docker-1.13.1
+
+dest_key: "/home/{{ ose_user }}/.ssh/id_rsa"
+admin_privkey: "files/id_key"
+
+default_okd_domain: "192.168.121.126.xip.io"

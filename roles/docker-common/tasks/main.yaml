@@ -1,0 +1,14 @@
+- name: "install docker service"
+  package:
+    name: 
+    - docker
+    - python-docker-py
+    - python-ldap # for a python script
+    - openldap-clients
+    state: present
+
+- name: "check if docker started"
+  service: 
+    name: docker 
+    state: started 
+    enabled: yes

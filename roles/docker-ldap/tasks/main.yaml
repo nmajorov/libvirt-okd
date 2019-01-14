@@ -1,0 +1,37 @@
+- name: pull ldap image image
+  docker_image:
+    name: "{{ldap_image }}"
+
+- name: start ldap image
+  docker_container:
+    name: opldap
+    image: "{{ldap_image }}"
+    ports:
+      - "389:389" 
+      - "689:689"
+    env: 
+      LDAP_ORGANISATION: "My company" 
+      LDAP_ADMIN_PASSWORD: "{{ ldap_admin_password }}"
+
+- name: sleep for 10 seconds and continue with play
+  wait_for: timeout=10
+  delegate_to: localhost
+
+- name: "check ldap connectivity"
+  command: ldapsearch -x -H ldap://127.0.0.1 -b dc=example,dc=org -D "cn=admin,dc=example,dc=org" -w "{{ ldap_admin_password }}"
+  register: ldap_search_out
+- debug:
+     msg: "{{ldap_search_out.stdout_lines}}"
+
+- name: "copy ldiff file"
+  copy:
+    src: files/ldap.ldif
+    dest: /tmp/ldap-full.ldif 
+         
+- name: "import some users in ldap"
+  command: 'ldapmodify  -v  -x -H ldap://127.0.0.1  -D "cn=admin,dc=example,dc=org" -w admin  -f /tmp/ldap-full.ldif'
+
+
+  #
+  # ldapsearch -x -H ldap://127.0.0.1 -b dc=example,dc=org -D "cn=admin,dc=example,dc=org" -w admin  -s sub  "(objectclass=*)"
+  # 

@@ -1,0 +1,53 @@
+dn: ou=people, dc=example,dc=org
+changetype: add
+ou: people
+description: All people in organisation
+objectclass: organizationalunit
+
+## SECOND Level hierarchy
+## ADD a single entry under FIRST (people) level
+# this is an ENTRY sequence and is preceded by a BLANK line
+# the ou: Human Resources is the department name
+
+dn: cn=Robert Smith,ou=people,dc=example,dc=org
+changetype: add
+objectclass: inetOrgPerson
+cn: Robert Smith
+cn: Robert J Smith
+sn: smith
+uid: rjsmith
+userpassword: test
+carlicense: HISCAR 123
+homephone: 555-111-2222
+mail: r.smith@example.com
+description: swell guy
+ou: Human Resources
+
+dn: cn=Nikolaj Majorov,ou=people,dc=example,dc=org
+changetype: add
+objectclass: inetOrgPerson
+cn: Nikolaj Majorov
+cn: Nikolaj N  Majorov
+sn: majorov
+uid: nmajorov
+userpassword: test
+carlicense: HISCAR 123
+homephone: 555-111-2222
+mail: nmajorov@example.com
+description: Nikolaj
+ou: developers
+
+
+dn: cn=Teo Mayer,ou=people,dc=example,dc=org
+changetype: add
+objectclass: inetOrgPerson
+cn: Teo Mayer
+cn: Teo N  Mayer
+sn: tmayer
+uid: tmayer
+userpassword: test
+carlicense: HISCAR 123
+homephone: 555-111-2222
+mail: tmayer@example.com
+description: user Teo Mayer
+ou: developers

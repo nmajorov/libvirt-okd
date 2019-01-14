@@ -1,0 +1,78 @@
+# This is an example of an OpenShift-Ansible host inventory for a cluster
+# with natively hosted, containerized GlusterFS storage for both general
+# application use and a natively hosted Docker registry. It will also create a
+# StorageClass for the general storage.
+#
+# This inventory may be used with the deploy_cluster.yml playbook to deploy a new
+# cluster with GlusterFS storage.
+#
+# This inventory may also be used with openshift-glusterfs/config.yml to
+# deploy GlusterFS storage on an existing cluster. With this playbook, the
+# registry backend volume will be created but the administrator must then
+# either deploy a hosted registry or change an existing hosted registry to use
+# that volume.
+#
+# There are additional configuration parameters that can be specified to
+# control the deployment and state of a GlusterFS cluster. Please see the
+# documentation in playbooks/openshift-glusterfs/README.md and
+# roles/openshift_storage_glusterfs/README.md for additional details.
+
+[OSEv3:children]
+masters
+nodes
+etcd
+# Specify there will be GlusterFS nodes
+glusterfs
+
+
+[OSEv3:vars]
+ansible_ssh_user=vagrant
+openshift_deployment_type=origin
+openshift_master_default_subdomain=192.168.121.126.xip.io
+openshift_master_cluster_hostname=okd-master0.niko.io
+openshift_master_cluster_public_hostname=okd-master0.niko.io
+
+# If ansible_ssh_user is not root, ansible_become must be set to true and the
+# user must be configured for passwordless sudo
+ansible_become=yes
+# origin fix
+openshift_repos_enable_testing=true 
+openshift_version="3.11"
+openshift_disable_check=disk_availability,docker_storage,memory_availability
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true','challenge' : 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
+openshift_master_htpasswd_users={'admin':'$apr1$LGM6c5oI$HGaI97KRd81eNwyQGGhH0/', 'niko':'$apr1$UMcy6Azi$tIeJANzvhDmd0HRjJ638j1'}
+
+
+[masters]
+okd-master0.niko.io
+
+[nodes]
+# masters should be schedulable to run web console pods
+okd-master0.niko.io  openshift_node_group_name="node-config-master" openshift_schedulable=True
+# It is recommended to not use a single cluster for both general and registry
+# storage, so two three-node clusters will be required.
+okd-app0.niko.io openshift_node_group_name="node-config-compute"
+okd-app1.niko.io   openshift_node_group_name="node-config-compute"
+okd-app2.niko.io   openshift_node_group_name="node-config-compute"
+# A hosted registry, by default, will only be deployed on nodes labeled
+# "node-role.kubernetes.io/infra=true".
+okd-infra0.niko.io   openshift_node_group_name="node-config-infra"
+
+
+[etcd]
+okd-app0.niko.io
+okd-app1.niko.io
+okd-app2.niko.io
+
+
+# Specify the glusterfs group, which contains the nodes that will host
+# GlusterFS storage pods. At a minimum, each node must have a
+# "glusterfs_devices" variable defined. This variable is a list of block
+# devices the node will have access to that is intended solely for use as
+# GlusterFS storage. These block devices must be bare (e.g. have no data, not
+# be marked as LVM PVs), and will be formatted.
+[glusterfs]
+okd-app0.niko.io  glusterfs_devices='[ "/dev/vdb", "/dev/vdc", "/dev/vdd" ]'
+okd-app1.niko.io  glusterfs_devices='[ "/dev/vdb", "/dev/vdc", "/dev/vdd" ]'
+okd-app2.niko.io  glusterfs_devices='[ "/dev/vdb", "/dev/vdc", "/dev/vdd" ]'
+
