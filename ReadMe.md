@@ -15,7 +15,7 @@
 2. run vagrant
 
 
-    vagrant up
+           vagrant up
 
 
 3. repare servers and bastion
